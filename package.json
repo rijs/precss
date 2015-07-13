@@ -19,6 +19,7 @@
     "browserify": "^9.0.3",
     "chai": "^2.3.0",
     "components": "git://github.com/rijs/components",
+    "shadow": "git://github.com/rijs/shadow",
     "core": "git://github.com/rijs/core",
     "css": "git://github.com/rijs/css",
     "fn": "git://github.com/rijs/fn",
