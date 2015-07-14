@@ -14,6 +14,7 @@
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
+/* istanbul ignore next */
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 // -------------------------------------------
@@ -6984,6 +6985,7 @@ Library.prototype.test = function (obj, type) {
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
+/* istanbul ignore next */
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 // -------------------------------------------
@@ -7159,6 +7161,7 @@ var mutation = client && window.MutationRecord || noop,
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
+/* istanbul ignore next */
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 // render all elements that require the specified data
@@ -7174,6 +7177,7 @@ var all = _interopRequire(require("utilise/all"));
 },{"utilise/all":44}],43:[function(require,module,exports){
 "use strict";
 
+/* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
@@ -7649,6 +7653,7 @@ module.exports = require('values')
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
+/* istanbul ignore next */
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 // -------------------------------------------
@@ -7753,6 +7758,7 @@ log = log("[ri/core]");
 },{"./types/text":99,"colors":2,"utilise/chainable":100,"utilise/colorfill":101,"utilise/emitterify":102,"utilise/err":103,"utilise/header":104,"utilise/identity":105,"utilise/is":107,"utilise/log":108,"utilise/objectify":136,"utilise/rebind":137,"utilise/values":138}],99:[function(require,module,exports){
 "use strict";
 
+/* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
@@ -7971,6 +7977,7 @@ arguments[4][97][0].apply(exports,arguments)
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
+/* istanbul ignore next */
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 // -------------------------------------------
@@ -8014,6 +8021,7 @@ arguments[4][56][0].apply(exports,arguments)
 },{"dup":56}],148:[function(require,module,exports){
 "use strict";
 
+/* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
@@ -8092,6 +8100,7 @@ arguments[4][56][0].apply(exports,arguments)
 },{"dup":56}],162:[function(require,module,exports){
 "use strict";
 
+/* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
 /* istanbul ignore next */
