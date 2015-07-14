@@ -2,11 +2,11 @@ var expect = require('chai').expect
   , components = require('components')
   , noop = require('utilise/noop')
   , all = require('utilise/all')
-  , shadow = require('shadow')
+  , shadow = require('rijs.shadow')
   , precss = require('../')
-  , core = require('core')
-  , css = require('css')
-  , fn = require('fn')
+  , core = require('rijs.core')
+  , css = require('rijs.css')
+  , fn = require('rijs.fn')
   , container = document.createElement('div')
   , el
   
