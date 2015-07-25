@@ -6,7 +6,7 @@ var expect = require('chai').expect
   , core = require('rijs.core')
   , css = require('rijs.css')
   , fn = require('rijs.fn')
-  , precss = require('../')
+  , precss = require('./')
   , container = document.createElement('div')
   , el
   
