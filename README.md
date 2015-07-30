@@ -4,6 +4,6 @@
 
 Pre-applies CSS Styles to a component before rendering it
 
-```js
+```html
 <component-name css="styles.css">
 ```
