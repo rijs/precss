@@ -53,8 +53,8 @@ function polyfill(css, prefix){
           .replace(/:host/gi, prefix)
           .replace(/^(.+)[{]/gim, function($1){ return prefix+' '+$1 })
           .replace(/^(.+)(^[:])[,]/gim, function($1){ return prefix+' '+$1 })
-          .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix)
           .replace(/\/deep\/ /gim, '')
+          .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix)
 }
 
 function css(ripple) {
