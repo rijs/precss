@@ -97,7 +97,6 @@ describe('Scoped CSS', function(){
       , expected = document.head.createShadowRoot 
           ? '<style>* { color: red }</style>'
           : '<style resource="foo.css">css-2 * { color: red }</style>'
-
       , result
 
     ripple('foo.css', '* { color: red }')
@@ -109,5 +108,20 @@ describe('Scoped CSS', function(){
     expect(getComputedStyle(el.shadowRoot.firstChild).color).to.be.eql('rgb(255, 0, 0)')
     expect(getComputedStyle(document.body).color).to.not.eql('rgb(255, 0, 0)')
   })
+
+  it('should not mess up keyframes', function(){  
+    var ripple = precss(components(fn(css(core()))))
+      , keyframes = '@keyframes fade-in {\n'
+                  + '0% { opacity: 0; }\n'
+                  + '100% { opacity: 0.5; }\n'
+                  + '}'
+
+    ripple('css-2', noop)
+    ripple('foo.css', keyframes)
+    ripple.draw()
+
+    expect(raw('style', el).innerHTML).to.equal(keyframes)
+  })
+
 
 })
