@@ -58,15 +58,14 @@ function polyfill(css, el){
 
   return !prefix ? css
        : css
-          .replace(/:host\((.+)\)/gi, ($1, $2) => prefix+$2)              // :host(...) -> tag...
-          .replace(/:host/gi, prefix)                                     // :host      -> tag
-          .replace(/^([^@%]*)[{]/gim, $1 => prefix+' '+$1 )               // ... {      -> tag ... {
-          .replace(/^([^:]*)[,]/gim, $1 => prefix+' '+$1)                 // ... ,      -> tag ... ,
-          .replace(/\/deep\/ /gim, '')                                    // /deep/     -> 
-          .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix)  // tag tag    -> tag
+          .replace(/:host\((.+?)\)/gi, ($1, $2) => prefix+$2)             // :host(...) -> tag...
+          .replace(/:host/gi, prefix)                                    // :host      -> tag
+          .replace(/^([^@%]*)[{]/gi, $1 => prefix+' '+$1 )               // ... {      -> tag ... {
+          .replace(/^([^:]*)[,]/gi, $1 => prefix+' '+$1)                 // ... ,      -> tag ... ,
+          .replace(/\/deep\/ /gi, '')                                    // /deep/     -> 
+          .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix) // tag tag    -> tag
 }
 
-// ' * ,\n color:rgba(1,2,3) {'.replace(/(.*)[^:](.*)[,]/gim, function($1){ return 'css-2 '+$1 }) 
 function css(ripple) {
   return res => {
     return all(`[css="${res.name}"]:not([inert])`)

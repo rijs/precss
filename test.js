@@ -123,5 +123,15 @@ describe('Scoped CSS', function(){
     expect(raw('style', el).innerHTML).to.equal(keyframes)
   })
 
+  it('should not be greedy with :host brackets', function(){  
+    var ripple = precss(components(fn(css(core()))))
+      , style = ':host(.full) header > :not(h3) { }'
+
+    ripple('css-2', noop)
+    ripple('foo.css', style)
+    ripple.draw()
+
+    expect(raw('style', el).innerHTML).to.equal('css-2.full header > :not(h3) { }')
+  })
 
 })

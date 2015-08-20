@@ -64,22 +64,21 @@ function polyfill(css, el) {
   var prefix = attr(el, "is") ? "[is=\"" + attr(el, "is") + "\"]" : el.tagName.toLowerCase(),
       escaped = prefix.replace(/\[/g, "\\[").replace(/\]/g, "\\]");
 
-  return !prefix ? css : css.replace(/:host\((.+)\)/gi, function ($1, $2) {
+  return !prefix ? css : css.replace(/:host\((.+?)\)/gi, function ($1, $2) {
     return prefix + $2;
   }) // :host(...) -> tag...
   .replace(/:host/gi, prefix) // :host      -> tag
-  .replace(/^([^@%]*)[{]/gim, function ($1) {
+  .replace(/^([^@%]*)[{]/gi, function ($1) {
     return prefix + " " + $1;
   }) // ... {      -> tag ... {
-  .replace(/^([^:]*)[,]/gim, function ($1) {
+  .replace(/^([^:]*)[,]/gi, function ($1) {
     return prefix + " " + $1;
   }) // ... ,      -> tag ... ,
-  .replace(/\/deep\/ /gim, "") // /deep/     ->
+  .replace(/\/deep\/ /gi, "") // /deep/     ->
   .replace(new RegExp(escaped + "[\\s]*" + escaped, "g"), prefix) // tag tag    -> tag
   ;
 }
 
-// ' * ,\n color:rgba(1,2,3) {'.replace(/(.*)[^:](.*)[,]/gim, function($1){ return 'css-2 '+$1 })
 function css(ripple) {
   return function (res) {
     return all("[css=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
