@@ -134,4 +134,30 @@ describe('Scoped CSS', function(){
     expect(raw('style', el).innerHTML).to.equal('css-2.full header > :not(h3) { }')
   })
 
+
+  it('should scope all selectors with prefix', function(){  
+    var ripple = precss(components(fn(css(core()))))
+      , style = '*,\n'
+              + '*::before,\n'
+              + '*::after {\n'
+              + '  font-family: Gotham;\n'
+              + '  font-weight: 500;\n'
+              + '  box-sizing: border-box;  }\n'
+              + '})'
+
+    ripple('css-2', noop)
+    ripple('foo.css', style)
+    ripple.draw()
+
+    expect(raw('style', el).innerHTML).to.equal(
+        'css-2 *,\n'
+      + 'css-2 *::before,\n'
+      + 'css-2 *::after {\n'
+      + '  font-family: Gotham;\n'
+      + '  font-weight: 500;\n'
+      + '  box-sizing: border-box;  }\n'
+      + '})'
+    )
+  })
+
 })

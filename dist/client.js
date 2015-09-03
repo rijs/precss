@@ -68,10 +68,10 @@ function polyfill(css, el) {
     return prefix + $2;
   }) // :host(...) -> tag...
   .replace(/:host/gi, prefix) // :host      -> tag
-  .replace(/^([^@%]*)[{]/gi, function ($1) {
+  .replace(/^([^@%\n]*){/gim, function ($1) {
     return prefix + " " + $1;
   }) // ... {      -> tag ... {
-  .replace(/^([^:]*)[,]/gi, function ($1) {
+  .replace(/^(.*?),\s*$/gim, function ($1) {
     return prefix + " " + $1;
   }) // ... ,      -> tag ... ,
   .replace(/\/deep\/ /gi, "") // /deep/     ->

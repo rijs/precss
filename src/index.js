@@ -58,10 +58,10 @@ function polyfill(css, el){
 
   return !prefix ? css
        : css
-          .replace(/:host\((.+?)\)/gi, ($1, $2) => prefix+$2)             // :host(...) -> tag...
+          .replace(/:host\((.+?)\)/gi, ($1, $2) => prefix+$2)            // :host(...) -> tag...
           .replace(/:host/gi, prefix)                                    // :host      -> tag
-          .replace(/^([^@%]*)[{]/gi, $1 => prefix+' '+$1 )               // ... {      -> tag ... {
-          .replace(/^([^:]*)[,]/gi, $1 => prefix+' '+$1)                 // ... ,      -> tag ... ,
+          .replace(/^([^@%\n]*){/gim, $1 => prefix+' '+$1 )              // ... {      -> tag ... {
+          .replace(/^(.*?),\s*$/gim, $1 => prefix+' '+$1)                // ... ,      -> tag ... ,
           .replace(/\/deep\/ /gi, '')                                    // /deep/     -> 
           .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix) // tag tag    -> tag
 }
