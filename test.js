@@ -8,25 +8,29 @@ var expect = require('chai').expect
   , fn = require('rijs.fn')
   , precss = require('./')
   , container = document.createElement('div')
+  , head = document.head
+  , clean
   , el
   
 describe('Scoped CSS', function(){
 
   before(function(){
     document.body.appendChild(container)
+    clean = document.head.innerHTML
   })
   
   beforeEach(function(done){
+    document.head = clean
     container.innerHTML = '<css-1></css-1>'
-                        + '<css-2 css="foo.css"></css-2>'
+                        + '<css-2 css="foo.css"><a></a></css-2>'
 
     el = container.children[1]
     setTimeout(done, 50)
   })
 
-  after(function(){
-    document.body.removeChild(container)
-  })
+  // after(function(){
+  //   document.body.removeChild(container)
+  // })
 
   it('should render component with css loaded', function(){  
     var ripple = precss(components(fn(css(core()))))
@@ -37,7 +41,7 @@ describe('Scoped CSS', function(){
     ripple.draw()
 
     expect(result).to.be.ok
-    expect(el.innerHTML).to.equal('<style resource="foo.css">css-2 * { color: red }</style>')
+    expect(head.lastChild.outerHTML).to.equal('<style resource="foo.css">css-2 * { color: red }</style>')
     expect(getComputedStyle(el.firstChild).color).to.be.eql('rgb(255, 0, 0)')
     expect(getComputedStyle(document.body).color).to.not.eql('rgb(255, 0, 0)')
   })
@@ -52,7 +56,7 @@ describe('Scoped CSS', function(){
     ripple('css-2', function(){ result = true })
     ripple.draw()
 
-    expect(all('style', container).length).to.equal(1)
+    expect(all('style', head).length).to.equal(1)
   })
 
   it('should render component when css becomes available', function(done){  
@@ -67,7 +71,7 @@ describe('Scoped CSS', function(){
     
     setTimeout(function(){
       expect(result).to.equal(1)
-      expect(el.innerHTML).to.equal('<style resource="foo.css">css-2 * { color: red }</style>')
+      expect(head.lastChild.outerHTML).to.equal('<style resource="foo.css">css-2 * { color: red }</style>')
       done()
     }, 150)
   })
@@ -94,7 +98,8 @@ describe('Scoped CSS', function(){
 
   it('should render component with css loaded with shadow', function(){  
     var ripple = shadow(precss(components(fn(css(core())))))
-      , expected = document.head.createShadowRoot 
+      , hasShadow = document.head.createShadowRoot
+      , expected = hasShadow 
           ? '<style>* { color: red }</style>'
           : '<style resource="foo.css">css-2 * { color: red }</style>'
       , result
@@ -104,7 +109,7 @@ describe('Scoped CSS', function(){
     ripple.draw()
 
     expect(result).to.be.ok
-    expect(el.shadowRoot.innerHTML).to.equal(expected)
+    expect(hasShadow ? el.shadowRoot.firstChild.outerHTML : head.lastChild.outerHTML).to.equal(expected)
     expect(getComputedStyle(el.shadowRoot.firstChild).color).to.be.eql('rgb(255, 0, 0)')
     expect(getComputedStyle(document.body).color).to.not.eql('rgb(255, 0, 0)')
   })
@@ -120,7 +125,7 @@ describe('Scoped CSS', function(){
     ripple('foo.css', keyframes)
     ripple.draw()
 
-    expect(raw('style', el).innerHTML).to.equal(keyframes)
+    expect(raw('style', head).innerHTML).to.equal(keyframes)
   })
 
   it('should not be greedy with :host brackets', function(){  
@@ -131,9 +136,8 @@ describe('Scoped CSS', function(){
     ripple('foo.css', style)
     ripple.draw()
 
-    expect(raw('style', el).innerHTML).to.equal('css-2.full header > :not(h3) { }')
+    expect(raw('style', head).innerHTML).to.equal('css-2.full header > :not(h3) { }')
   })
-
 
   it('should scope all selectors with prefix', function(){  
     var ripple = precss(components(fn(css(core()))))
@@ -149,7 +153,7 @@ describe('Scoped CSS', function(){
     ripple('foo.css', style)
     ripple.draw()
 
-    expect(raw('style', el).innerHTML).to.equal(
+    expect(raw('style', head).innerHTML).to.equal(
         'css-2 *,\n'
       + 'css-2 *::before,\n'
       + 'css-2 *::after {\n'

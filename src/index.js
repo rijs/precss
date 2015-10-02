@@ -13,7 +13,8 @@ export default function precss(ripple){
     var css = attr(el, 'css')
       , root = el.shadowRoot || el
       , style, styles, prefix = ''
-      , noShadow = !el.shadowRoot || !document.head.createShadowRoot
+      , head = document.head
+      , noShadow = !el.shadowRoot || !head.createShadowRoot
 
     // this el does not have a css dep, continue with rest of rendering pipeline
     if (!css) return render(el)
@@ -21,9 +22,8 @@ export default function precss(ripple){
     // this el has a css dep, but it is not loaded yet - stop rendering this el
     if (css && !ripple.resources[css]) return;
     
-
     // this el does not have a shadow and css has already been added, so reuse that
-    if (noShadow && raw(`style[resource="${css}"]`)) style = raw(`style[resource="${css}"]`)
+    if (noShadow && raw(`style[resource="${css}"]`, head)) style = raw(`style[resource="${css}"]`, head)
 
     // reuse or create style tag
     style = style || raw('style', root) || document.createElement('style')
@@ -41,7 +41,10 @@ export default function precss(ripple){
     style.innerHTML = styles 
 
     // append if not already attached
-    if (!style.parentNode) root.insertBefore(style, root.firstChild)
+    if (!style.parentNode) 
+      noShadow
+        ? head.appendChild(style)
+        : root.insertBefore(style, root.firstChild)
 
     // continue with rest of the rendering pipeline
     render(el)

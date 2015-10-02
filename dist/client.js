@@ -24,7 +24,8 @@ function precss(ripple) {
         style,
         styles,
         prefix = "",
-        noShadow = !el.shadowRoot || !document.head.createShadowRoot;
+        head = document.head,
+        noShadow = !el.shadowRoot || !head.createShadowRoot;
 
     // this el does not have a css dep, continue with rest of rendering pipeline
     if (!css) return render(el);
@@ -33,7 +34,7 @@ function precss(ripple) {
     if (css && !ripple.resources[css]) return;
 
     // this el does not have a shadow and css has already been added, so reuse that
-    if (noShadow && raw("style[resource=\"" + css + "\"]")) style = raw("style[resource=\"" + css + "\"]");
+    if (noShadow && raw("style[resource=\"" + css + "\"]", head)) style = raw("style[resource=\"" + css + "\"]", head);
 
     // reuse or create style tag
     style = style || raw("style", root) || document.createElement("style");
@@ -51,7 +52,7 @@ function precss(ripple) {
     style.innerHTML = styles;
 
     // append if not already attached
-    if (!style.parentNode) root.insertBefore(style, root.firstChild);
+    if (!style.parentNode) noShadow ? head.appendChild(style) : root.insertBefore(style, root.firstChild);
 
     // continue with rest of the rendering pipeline
     render(el);
@@ -205,9 +206,9 @@ function isDef(d) {
 
 function isIn(set) {
   return function(d){
-    return  set.indexOf 
-         ? ~set.indexOf(d)
-         :  d in set
+    return !set ? false  
+         : set.indexOf ? ~set.indexOf(d)
+         : d in set
   }
 }
 },{}],7:[function(require,module,exports){
@@ -229,8 +230,9 @@ module.exports = function key(k, v){
                                 : (set ? (key(keys.join('.'), v)(o[root] ? o[root] : (o[root] = {})), o)
                                        : key(keys.join('.'))(o[root]))
 
-    function copy(d){
-      key(d, key(d)(o))(masked)
+    function copy(k){
+      var val = key(k)(o)
+      ;(val != undefined) && key(k, val)(masked)
     }
   }
 }
