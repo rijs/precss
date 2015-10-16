@@ -28,9 +28,9 @@ describe('Scoped CSS', function(){
     setTimeout(done, 50)
   })
 
-  // after(function(){
-  //   document.body.removeChild(container)
-  // })
+  after(function(){
+    document.body.removeChild(container)
+  })
 
   it('should render component with css loaded', function(){  
     var ripple = precss(components(fn(css(core()))))

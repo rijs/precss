@@ -47,7 +47,7 @@ export default function precss(ripple){
         : root.insertBefore(style, root.firstChild)
 
     // continue with rest of the rendering pipeline
-    render(el)
+    return render(el)
   }
 
   return ripple

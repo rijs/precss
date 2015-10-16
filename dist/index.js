@@ -54,7 +54,7 @@ function precss(ripple) {
     if (!style.parentNode) noShadow ? head.appendChild(style) : root.insertBefore(style, root.firstChild);
 
     // continue with rest of the rendering pipeline
-    render(el);
+    return render(el);
   };
 
   return ripple;
