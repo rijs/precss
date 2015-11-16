@@ -1,6 +1,7 @@
 var expect = require('chai').expect
   , noop = require('utilise/noop')
   , all = require('utilise/all')
+  , time = require('utilise/time')
   , components = require('rijs.components')
   , shadow = require('rijs.shadow')
   , core = require('rijs.core')
@@ -25,7 +26,7 @@ describe('Scoped CSS', function(){
                         + '<css-2 css="foo.css"><a></a></css-2>'
 
     el = container.children[1]
-    setTimeout(done, 50)
+    time(50, done)
   })
 
   after(function(){
@@ -65,15 +66,15 @@ describe('Scoped CSS', function(){
 
     ripple('css-2', function(){ result++ })
 
-    setTimeout(function(){
+    time(50, function(){
       ripple('foo.css', '* { color: red }')
-    }, 50)
+    })
     
-    setTimeout(function(){
+    time(150, function(){
       expect(result).to.equal(1)
       expect(head.lastChild.outerHTML).to.equal('<style resource="foo.css">css-2 * { color: red }</style>')
       done()
-    }, 150)
+    })
   })
 
   it('should render component with no css dep', function(){  
@@ -100,7 +101,7 @@ describe('Scoped CSS', function(){
     var ripple = shadow(precss(components(fn(css(core())))))
       , hasShadow = document.head.createShadowRoot
       , expected = hasShadow 
-          ? '<style>* { color: red }</style>'
+          ? '<style resource="foo.css">* { color: red }</style>'
           : '<style resource="foo.css">css-2 * { color: red }</style>'
       , result
 
@@ -139,29 +140,38 @@ describe('Scoped CSS', function(){
     expect(raw('style', head).innerHTML).to.equal('css-2.full header > :not(h3) { }')
   })
 
-  it('should scope all selectors with prefix', function(){  
+  it('should update components with multiple css deps', function(done){  
+    container.innerHTML = '<css-2 css="foo.css bar.css">'
+
     var ripple = precss(components(fn(css(core()))))
-      , style = '*,\n'
-              + '*::before,\n'
-              + '*::after {\n'
-              + '  font-family: Gotham;\n'
-              + '  font-weight: 500;\n'
-              + '  box-sizing: border-box;  }\n'
-              + '})'
+      , result
+
+    ripple('css-2', function(){ result = true })
+    ripple('foo.css', ' ')
+
+    time(30, function(){
+      expect(result).to.not.be.ok
+      ripple('bar.css', ' ')
+      expect(result).to.not.be.ok
+    })
+
+    time(60, function(){
+      expect(result).to.be.ok
+      expect(raw('[resource="foo.css"]')).to.be.ok
+      expect(raw('[resource="bar.css"]')).to.be.ok
+      done()
+    })
+  })
+
+  it('should parse :host-context', function(){  
+    var ripple = precss(components(fn(css(core()))))
+      , style = ':host-context(.full) { }'
 
     ripple('css-2', noop)
     ripple('foo.css', style)
     ripple.draw()
 
-    expect(raw('style', head).innerHTML).to.equal(
-        'css-2 *,\n'
-      + 'css-2 *::before,\n'
-      + 'css-2 *::after {\n'
-      + '  font-family: Gotham;\n'
-      + '  font-weight: 500;\n'
-      + '  box-sizing: border-box;  }\n'
-      + '})'
-    )
+    expect(raw('style', head).innerHTML).to.equal('.full css-2 { }')
   })
 
 })

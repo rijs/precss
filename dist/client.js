@@ -14,77 +14,79 @@ function precss(ripple) {
     return;
   }log("creating");
 
-  var render = ripple.render;
+  ripple.render = render(ripple)(ripple.render);
 
-  key("types.text/css.render", wrap(css(ripple)))(ripple);
-
-  ripple.render = function (el) {
-    var css = attr(el, "css"),
-        root = el.shadowRoot || el,
-        style,
-        styles,
-        prefix = "",
-        head = document.head,
-        noShadow = !el.shadowRoot || !head.createShadowRoot;
-
-    // this el does not have a css dep, continue with rest of rendering pipeline
-    if (!css) return render(el);
-
-    // this el has a css dep, but it is not loaded yet - stop rendering this el
-    if (css && !ripple.resources[css]) return;
-
-    // this el does not have a shadow and css has already been added, so reuse that
-    if (noShadow && raw("style[resource=\"" + css + "\"]", head)) style = raw("style[resource=\"" + css + "\"]", head);
-
-    // reuse or create style tag
-    style = style || raw("style", root) || document.createElement("style");
-
-    // mark tag if no shadow for optimisation
-    attr(style, "resource", noShadow ? css : false);
-
-    // retrieve styles
-    styles = ripple(css);
-
-    // scope css if no shadow
-    if (noShadow) styles = polyfill(styles, el);
-
-    // update styles
-    style.innerHTML = styles;
-
-    // append if not already attached
-    if (!style.parentNode) noShadow ? head.appendChild(style) : root.insertBefore(style, root.firstChild);
-
-    // continue with rest of the rendering pipeline
-    return render(el);
-  };
+  values(ripple.types).filter(by("header", "text/css")).map(function (type) {
+    return type.render = proxy(type.render, css(ripple));
+  });
 
   return ripple;
 }
 
-function polyfill(css, el) {
-  var prefix = attr(el, "is") ? "[is=\"" + attr(el, "is") + "\"]" : el.tagName.toLowerCase(),
-      escaped = prefix.replace(/\[/g, "\\[").replace(/\]/g, "\\]");
+function render(ripple) {
+  return function (next) {
+    return function (host) {
+      var css = str(attr(host, "css")).split(" ").filter(Boolean),
+          root = host.shadowRoot || host,
+          head = document.head,
+          shadow = head.createShadowRoot && host.shadowRoot,
+          styles;
 
-  return !prefix ? css : css.replace(/:host\((.+?)\)/gi, function ($1, $2) {
-    return prefix + $2;
-  }) // :host(...) -> tag...
-  .replace(/:host/gi, prefix) // :host      -> tag
-  .replace(/^([^@%\n]*){/gim, function ($1) {
-    return prefix + " " + $1;
-  }) // ... {      -> tag ... {
-  .replace(/^(.*?),\s*$/gim, function ($1) {
-    return prefix + " " + $1;
-  }) // ... ,      -> tag ... ,
-  .replace(/\/deep\/ /gi, "") // /deep/     ->
-  .replace(new RegExp(escaped + "[\\s]*" + escaped, "g"), prefix) // tag tag    -> tag
-  ;
+      // this host does not have a css dep, continue with rest of rendering pipeline
+      if (!css.length) return next(host);
+
+      // this host has a css dep, but it is not loaded yet - stop rendering this host
+      if (css.some(not(is["in"](ripple.resources)))) return;
+
+      // retrieve styles
+      styles = css.map(from(ripple.resources)).map(key("body")).map(polyfill(host, shadow));
+
+      // reuse or create style tag
+      css.map(function (d) {
+        return raw("style[resource=\"" + d + "\"]", shadow ? root : head) || el("style[resource=" + d + "]");
+      }).map(function (d, i) {
+        return (d.innerHTML = styles[i], d);
+      }).filter(not(by("parentNode"))).map(function (d) {
+        return (shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d), d);
+      });
+
+      // continue with rest of the rendering pipeline
+      return next(host);
+    };
+  };
+}
+
+function polyfill(el, shadow) {
+  return shadow ? identity : function (styles) {
+    var prefix = attr(el, "is") ? "[is=\"" + attr(el, "is") + "\"]" : el.nodeName.toLowerCase(),
+        escaped = prefix.replace(/\[/g, "\\[").replace(/\]/g, "\\]");
+
+    return !prefix ? styles : styles.replace(/:host\((.+?)\)/gi, function ($1, $2) {
+      return prefix + $2;
+    }) // :host(...) -> tag...
+    .replace(/:host /gi, prefix + " ") // :host      -> tag
+    .replace(/^([^@%\n]*){/gim, function ($1) {
+      return prefix + " " + $1;
+    }) // ... {      -> tag ... {
+    .replace(/^(.*?),\s*$/gim, function ($1) {
+      return prefix + " " + $1;
+    }) // ... ,      -> tag ... ,
+    .replace(/\/deep\/ /gi, "") // /deep/     ->
+    .replace(/^.*:host-context\((.+?)\)/gim, function ($1, $2) {
+      return $2 + " " + prefix;
+    }) // :host(...) -> tag...
+    .replace(new RegExp(escaped + "[\\s]*" + escaped, "g"), prefix) // tag tag    -> tag
+    ;
+  };
 }
 
 function css(ripple) {
   return function (res) {
-    return all("[css=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
+    return all("[css~=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
   };
 }
+
+var identity = _interopRequire(require("utilise/identity"));
 
 var client = _interopRequire(require("utilise/client"));
 
@@ -98,20 +100,16 @@ var raw = _interopRequire(require("utilise/raw"));
 
 var key = _interopRequire(require("utilise/key"));
 
-var log = _interopRequire(require("utilise/log"));
-
-var err = _interopRequire(require("utilise/err"));
-
-log = log("[ri/precss]");
-err = err("[ri/precss]");
-},{"utilise/all":2,"utilise/attr":3,"utilise/client":4,"utilise/err":5,"utilise/key":7,"utilise/log":8,"utilise/raw":10,"utilise/wrap":13}],2:[function(require,module,exports){
+var log = require("utilise/log")("[ri/precss]");
+err = require("utilise/err")("[ri/precss]");
+},{"utilise/all":2,"utilise/attr":3,"utilise/client":4,"utilise/err":5,"utilise/identity":6,"utilise/key":8,"utilise/log":9,"utilise/raw":11,"utilise/wrap":14}],2:[function(require,module,exports){
 var to = require('utilise/to')
 
 module.exports = function all(selector, doc){
   var prefix = !doc && document.head.createShadowRoot ? 'html /deep/ ' : ''
   return to.arr((doc || document).querySelectorAll(prefix+selector))
 }
-},{"utilise/to":12}],3:[function(require,module,exports){
+},{"utilise/to":13}],3:[function(require,module,exports){
 var is = require('utilise/is')
 
 module.exports = function attr(d, name, value) {
@@ -124,7 +122,7 @@ module.exports = function attr(d, name, value) {
       && d.attributes.getNamedItem(name).value
 }
 
-},{"utilise/is":6}],4:[function(require,module,exports){
+},{"utilise/is":7}],4:[function(require,module,exports){
 module.exports = typeof window != 'undefined'
 },{}],5:[function(require,module,exports){
 var owner = require('utilise/owner')
@@ -138,7 +136,11 @@ module.exports = function err(prefix){
     return console.error.apply(console, args), d
   }
 }
-},{"utilise/owner":9,"utilise/to":12}],6:[function(require,module,exports){
+},{"utilise/owner":10,"utilise/to":13}],6:[function(require,module,exports){
+module.exports = function identity(d) {
+  return d
+}
+},{}],7:[function(require,module,exports){
 module.exports = is
 is.fn     = isFunction
 is.str    = isString
@@ -211,7 +213,7 @@ function isIn(set) {
          : d in set
   }
 }
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var is = require('utilise/is')
   , str = require('utilise/str')
 
@@ -236,7 +238,7 @@ module.exports = function key(k, v){
     }
   }
 }
-},{"utilise/is":6,"utilise/str":11}],8:[function(require,module,exports){
+},{"utilise/is":7,"utilise/str":12}],9:[function(require,module,exports){
 var is = require('utilise/is')
   , to = require('utilise/to')
   , owner = require('utilise/owner')
@@ -250,16 +252,16 @@ module.exports = function log(prefix){
     return console.log.apply(console, args), d
   }
 }
-},{"utilise/is":6,"utilise/owner":9,"utilise/to":12}],9:[function(require,module,exports){
+},{"utilise/is":7,"utilise/owner":10,"utilise/to":13}],10:[function(require,module,exports){
 (function (global){
 module.exports = require('utilise/client') ? /* istanbul ignore next */ window : global
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"utilise/client":4}],10:[function(require,module,exports){
+},{"utilise/client":4}],11:[function(require,module,exports){
 module.exports = function raw(selector, doc){
   var prefix = !doc && document.head.createShadowRoot ? 'html /deep/ ' : ''
   return (doc ? doc : document).querySelector(prefix+selector)
 }
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var is = require('utilise/is') 
 
 module.exports = function str(d){
@@ -269,7 +271,7 @@ module.exports = function str(d){
        : is.obj(d) ? JSON.stringify(d)
        : String(d)
 }
-},{"utilise/is":6}],12:[function(require,module,exports){
+},{"utilise/is":7}],13:[function(require,module,exports){
 module.exports = { 
   arr: toArray
 , obj: toObject
@@ -293,7 +295,7 @@ function toObject(d) {
     return p
   }
 }
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = function wrap(d){
   return function(){
     return d
