@@ -1,21 +1,51 @@
-"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = precss;
+
+var _identity = require('utilise/identity');
+
+var _identity2 = _interopRequireDefault(_identity);
+
+var _client = require('utilise/client');
+
+var _client2 = _interopRequireDefault(_client);
+
+var _attr = require('utilise/attr');
+
+var _attr2 = _interopRequireDefault(_attr);
+
+var _wrap = require('utilise/wrap');
+
+var _wrap2 = _interopRequireDefault(_wrap);
+
+var _all = require('utilise/all');
+
+var _all2 = _interopRequireDefault(_all);
+
+var _raw = require('utilise/raw');
+
+var _raw2 = _interopRequireDefault(_raw);
+
+var _key = require('utilise/key');
+
+var _key2 = _interopRequireDefault(_key);
 
 /* istanbul ignore next */
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // -------------------------------------------
 // API: Pre-applies Scoped CSS [css=name]
 // -------------------------------------------
-module.exports = precss;
-
 function precss(ripple) {
-  if (!client) {
-    return;
-  }log("creating");
+  if (!_client2.default) return;
+  log('creating');
 
   ripple.render = render(ripple)(ripple.render);
 
-  values(ripple.types).filter(by("header", "text/css")).map(function (type) {
+  values(ripple.types).filter(by('header', 'text/css')).map(function (type) {
     return type.render = proxy(type.render, css(ripple));
   });
 
@@ -25,7 +55,7 @@ function precss(ripple) {
 function render(ripple) {
   return function (next) {
     return function (host) {
-      var css = str(attr(host, "css")).split(" ").filter(Boolean),
+      var css = str((0, _attr2.default)(host, 'css')).split(' ').filter(Boolean),
           root = host.shadowRoot || host,
           head = document.head,
           shadow = head.createShadowRoot && host.shadowRoot,
@@ -35,18 +65,18 @@ function render(ripple) {
       if (!css.length) return next(host);
 
       // this host has a css dep, but it is not loaded yet - stop rendering this host
-      if (css.some(not(is["in"](ripple.resources)))) return;
+      if (css.some(not(is.in(ripple.resources)))) return;
 
       // retrieve styles
-      styles = css.map(from(ripple.resources)).map(key("body")).map(polyfill(host, shadow));
+      styles = css.map(from(ripple.resources)).map((0, _key2.default)('body')).map(polyfill(host, shadow));
 
       // reuse or create style tag
       css.map(function (d) {
-        return raw("style[resource=\"" + d + "\"]", shadow ? root : head) || el("style[resource=" + d + "]");
+        return (0, _raw2.default)('style[resource="' + d + '"]', shadow ? root : head) || el('style[resource=' + d + ']');
       }).map(function (d, i) {
-        return (d.innerHTML = styles[i], d);
-      }).filter(not(by("parentNode"))).map(function (d) {
-        return (shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d), d);
+        return d.innerHTML = styles[i], d;
+      }).filter(not(by('parentNode'))).map(function (d) {
+        return shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d), d;
       });
 
       // continue with rest of the rendering pipeline
@@ -56,48 +86,33 @@ function render(ripple) {
 }
 
 function polyfill(el, shadow) {
-  return shadow ? identity : function (styles) {
-    var prefix = attr(el, "is") ? "[is=\"" + attr(el, "is") + "\"]" : el.nodeName.toLowerCase(),
-        escaped = prefix.replace(/\[/g, "\\[").replace(/\]/g, "\\]");
+  return shadow ? _identity2.default : function (styles) {
+    var prefix = (0, _attr2.default)(el, 'is') ? '[is="' + (0, _attr2.default)(el, 'is') + '"]' : el.nodeName.toLowerCase(),
+        escaped = prefix.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
 
     return !prefix ? styles : styles.replace(/:host\((.+?)\)/gi, function ($1, $2) {
       return prefix + $2;
     }) // :host(...) -> tag...
     .replace(/:host /gi, prefix + " ") // :host      -> tag
     .replace(/^([^@%\n]*){/gim, function ($1) {
-      return prefix + " " + $1;
+      return prefix + ' ' + $1;
     }) // ... {      -> tag ... {
     .replace(/^(.*?),\s*$/gim, function ($1) {
-      return prefix + " " + $1;
+      return prefix + ' ' + $1;
     }) // ... ,      -> tag ... ,
-    .replace(/\/deep\/ /gi, "") // /deep/     ->
+    .replace(/\/deep\/ /gi, '') // /deep/     ->
     .replace(/^.*:host-context\((.+?)\)/gim, function ($1, $2) {
       return $2 + " " + prefix;
     }) // :host(...) -> tag...
-    .replace(new RegExp(escaped + "[\\s]*" + escaped, "g"), prefix) // tag tag    -> tag
-    ;
+    .replace(new RegExp(escaped + '[\\s]*' + escaped, "g"), prefix); // tag tag    -> tag
   };
 }
 
 function css(ripple) {
   return function (res) {
-    return all("[css~=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
+    return (0, _all2.default)('[css~="' + res.name + '"]:not([inert])').map(ripple.draw);
   };
 }
 
-var identity = _interopRequire(require("utilise/identity"));
-
-var client = _interopRequire(require("utilise/client"));
-
-var attr = _interopRequire(require("utilise/attr"));
-
-var wrap = _interopRequire(require("utilise/wrap"));
-
-var all = _interopRequire(require("utilise/all"));
-
-var raw = _interopRequire(require("utilise/raw"));
-
-var key = _interopRequire(require("utilise/key"));
-
-var log = require("utilise/log")("[ri/precss]");
-err = require("utilise/err")("[ri/precss]");
+var log = require('utilise/log')('[ri/precss]'),
+    err = require('utilise/err')('[ri/precss]');

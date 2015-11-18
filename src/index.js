@@ -81,4 +81,4 @@ import all from 'utilise/all'
 import raw from 'utilise/raw'
 import key from 'utilise/key'
 var log = require('utilise/log')('[ri/precss]')
-    err = require('utilise/err')('[ri/precss]')
+  , err = require('utilise/err')('[ri/precss]')
