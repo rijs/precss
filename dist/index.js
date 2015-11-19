@@ -101,7 +101,7 @@ function polyfill(el, shadow) {
       return prefix + ' ' + $1;
     }) // ... ,      -> tag ... ,
     .replace(/\/deep\/ /gi, '') // /deep/     ->
-    .replace(/^.*:host-context\((.+?)\)/gim, function ($1, $2) {
+    .replace(/^.*:host-context\((.+)\)/gim, function ($1, $2) {
       return $2 + " " + prefix;
     }) // :host(...) -> tag...
     .replace(new RegExp(escaped + '[\\s]*' + escaped, "g"), prefix); // tag tag    -> tag

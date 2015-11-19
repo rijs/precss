@@ -165,13 +165,13 @@ describe('Scoped CSS', function(){
 
   it('should parse :host-context', function(){  
     var ripple = precss(components(fn(css(core()))))
-      , style = ':host-context(.full) { }'
+      , style = ':host-context(.full:not(.a)) { }'
 
     ripple('css-2', noop)
     ripple('foo.css', style)
     ripple.draw()
 
-    expect(raw('style', head).innerHTML).to.equal('.full css-2 { }')
+    expect(raw('style', head).innerHTML).to.equal('.full:not(.a) css-2 { }')
   })
 
 })

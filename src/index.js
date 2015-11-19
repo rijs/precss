@@ -61,7 +61,7 @@ function polyfill(el, shadow){
       .replace(/^([^@%\n]*){/gim, $1 => prefix+' '+$1 )                       // ... {      -> tag ... {
       .replace(/^(.*?),\s*$/gim, $1 => prefix+' '+$1)                         // ... ,      -> tag ... ,
       .replace(/\/deep\/ /gi, '')                                             // /deep/     -> 
-      .replace(/^.*:host-context\((.+?)\)/gim, ($1, $2) => $2 + " " + prefix) // :host(...) -> tag...
+      .replace(/^.*:host-context\((.+)\)/gim, ($1, $2) => $2 + " " + prefix) // :host(...) -> tag...
       .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix)          // tag tag    -> tag
   }
 }
