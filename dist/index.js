@@ -68,15 +68,15 @@ function render(ripple) {
       if (css.some(not(is.in(ripple.resources)))) return;
 
       // retrieve styles
-      styles = css.map(from(ripple.resources)).map((0, _key2.default)('body')).map(polyfill(host, shadow));
+      styles = css.map(from(ripple.resources)).map((0, _key2.default)('body')).map(scope(host, shadow, css));
 
       // reuse or create style tag
       css.map(function (d) {
         return (0, _raw2.default)('style[resource="' + d + '"]', shadow ? root : head) || el('style[resource=' + d + ']');
-      }).map(function (d, i) {
-        return d.innerHTML = styles[i], d;
-      }).filter(not(by('parentNode'))).map(function (d) {
-        return shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d), d;
+      }).map((0, _key2.default)('innerHTML', function (d, i) {
+        return styles[i];
+      })).filter(not(by('parentNode'))).map(function (d) {
+        return shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d);
       });
 
       // continue with rest of the rendering pipeline
@@ -85,12 +85,12 @@ function render(ripple) {
   };
 }
 
-function polyfill(el, shadow) {
-  return shadow ? _identity2.default : function (styles) {
-    var prefix = (0, _attr2.default)(el, 'is') ? '[is="' + (0, _attr2.default)(el, 'is') + '"]' : el.nodeName.toLowerCase(),
-        escaped = prefix.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
+function scope(el, shadow, names) {
+  return shadow ? _identity2.default : function (styles, i) {
+    var prefix = '[css~="' + names[i] + '"]',
+        escaped = '\\[css~="' + names[i] + '"\\]';
 
-    return !prefix ? styles : styles.replace(/:host\((.+?)\)/gi, function ($1, $2) {
+    return styles.replace(/:host\((.+?)\)/gi, function ($1, $2) {
       return prefix + $2;
     }) // :host(...) -> tag...
     .replace(/:host /gi, prefix + " ") // :host      -> tag

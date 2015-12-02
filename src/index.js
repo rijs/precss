@@ -33,14 +33,14 @@ function render(ripple){
       styles = css
         .map(from(ripple.resources))
         .map(key('body'))
-        .map(polyfill(host, shadow))
+        .map(scope(host, shadow, css))
 
       // reuse or create style tag
       css
         .map(d => raw(`style[resource="${d}"]`, shadow ? root : head) || el(`style[resource=${d}]`))
-        .map((d, i) => ((d.innerHTML = styles[i]), d))
+        .map(key('innerHTML', (d, i) => styles[i]))
         .filter(not(by('parentNode')))
-        .map(d => ((shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d)), d))
+        .map(d => shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d))
 
       // continue with rest of the rendering pipeline
       return next(host)
@@ -48,20 +48,18 @@ function render(ripple){
   }
 }
 
-function polyfill(el, shadow){
-  return shadow ? identity : styles => {
-    var prefix = attr(el, 'is') ? `[is="${attr(el, 'is')}"]` : el.nodeName.toLowerCase()
-      , escaped = prefix
-          .replace(/\[/g, '\\[')
-          .replace(/\]/g, '\\]')
+function scope(el, shadow, names){
+  return shadow ? identity : (styles, i) => {
+    var prefix  = `[css~="${names[i]}"]`
+      , escaped = `\\[css~="${names[i]}"\\]`
 
-    return !prefix ? styles : styles
+    return styles
       .replace(/:host\((.+?)\)/gi, ($1, $2) => prefix+$2)                     // :host(...) -> tag...
       .replace(/:host /gi, prefix + " ")                                      // :host      -> tag
       .replace(/^([^@%\n]*){/gim, $1 => prefix+' '+$1 )                       // ... {      -> tag ... {
       .replace(/^(.*?),\s*$/gim, $1 => prefix+' '+$1)                         // ... ,      -> tag ... ,
       .replace(/\/deep\/ /gi, '')                                             // /deep/     -> 
-      .replace(/^.*:host-context\((.+)\)/gim, ($1, $2) => $2 + " " + prefix) // :host(...) -> tag...
+      .replace(/^.*:host-context\((.+)\)/gim, ($1, $2) => $2 + " " + prefix)  // :host(...) -> tag...
       .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix)          // tag tag    -> tag
   }
 }
