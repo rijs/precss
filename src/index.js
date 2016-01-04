@@ -54,13 +54,13 @@ function scope(el, shadow, names){
       , escaped = `\\[css~="${names[i]}"\\]`
 
     return styles
+      .replace(/^(?!.*:host)([^@%\n]*){/gim, $1 => prefix+' '+$1 )            // ... {      -> tag ... {
+      .replace(/^(?!.*:host)(.*?),\s*$/gim, $1 => prefix+' '+$1)              // ... ,      -> tag ... ,
       .replace(/:host\((.+?)\)/gi, ($1, $2) => prefix+$2)                     // :host(...) -> tag...
       .replace(/:host /gi, prefix + " ")                                      // :host      -> tag
-      .replace(/^([^@%\n]*){/gim, $1 => prefix+' '+$1 )                       // ... {      -> tag ... {
-      .replace(/^(.*?),\s*$/gim, $1 => prefix+' '+$1)                         // ... ,      -> tag ... ,
       .replace(/\/deep\/ /gi, '')                                             // /deep/     -> 
       .replace(/^.*:host-context\((.+)\)/gim, ($1, $2) => $2 + " " + prefix)  // :host(...) -> tag...
-      .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix)          // tag tag    -> tag
+      // .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix)          // tag tag    -> tag
   }
 }
 

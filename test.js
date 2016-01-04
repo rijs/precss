@@ -224,4 +224,18 @@ describe('Scoped CSS', function(){
 
   })
 
+  it('should not prefix if :host present', function(done){  
+    var ripple = precss(components(fn(css(core()))))
+      
+    ripple('css-2', noop)
+    ripple('foo.css', '.foo :host(.is-sth) .bar {}')
+    ripple.draw()
+
+    time(40, function() {
+      expect(raw('style', head).innerHTML).to.equal('.foo [css~="foo.css"].is-sth .bar {}')
+      done()
+    })
+
+  })
+
 })
