@@ -238,4 +238,32 @@ describe('Scoped CSS', function(){
 
   })
 
+  it('should transform empty :host()', function(done){  
+    var ripple = precss(components(fn(css(core()))))
+      
+    ripple('css-2', noop)
+    ripple('foo.css', ':host() {}')
+    ripple.draw()
+
+    time(40, function() {
+      expect(raw('style', head).innerHTML).to.equal('[css~="foo.css"] {}')
+      done()
+    })
+
+  })
+  
+  it('should transform empty :host-context()', function(done){  
+    var ripple = precss(components(fn(css(core()))))
+      
+    ripple('css-2', noop)
+    ripple('foo.css', ':host-context() {}')
+    ripple.draw()
+
+    time(40, function() {
+      expect(raw('style', head).innerHTML.trim()).to.equal('[css~="foo.css"] {}')
+      done()
+    })
+
+  })
+
 })

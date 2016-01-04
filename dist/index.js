@@ -96,15 +96,14 @@ function scope(el, shadow, names) {
     .replace(/^(?!.*:host)(.*?),\s*$/gim, function ($1) {
       return prefix + ' ' + $1;
     }) // ... ,      -> tag ... ,
-    .replace(/:host\((.+?)\)/gi, function ($1, $2) {
+    .replace(/:host\((.*?)\)/gi, function ($1, $2) {
       return prefix + $2;
     }) // :host(...) -> tag...
     .replace(/:host /gi, prefix + " ") // :host      -> tag
     .replace(/\/deep\/ /gi, '') // /deep/     ->
-    .replace(/^.*:host-context\((.+)\)/gim, function ($1, $2) {
+    .replace(/^.*:host-context\((.*)\)/gim, function ($1, $2) {
       return $2 + " " + prefix;
     }); // :host(...) -> tag...
-    // .replace(new RegExp(escaped + '[\\s]*' + escaped,"g"), prefix)          // tag tag    -> tag
   };
 }
 
