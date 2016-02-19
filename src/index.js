@@ -31,7 +31,7 @@ const render = ripple => next => host => {
   styles = css
     .map(from(ripple.resources))
     .map(key('body'))
-    .map(scope(host, shadow, css))
+    .map(shadow ? identity : transform(css))
 
   // reuse or create style tag
   css
@@ -44,18 +44,7 @@ const render = ripple => next => host => {
   return next(host)
 }
 
-const scope = (el, shadow, names) => shadow ? identity : (styles, i) => {
-  const prefix  = `[css~="${names[i]}"]`
-      , escaped = `\\[css~="${names[i]}"\\]`
-
-  return styles
-    .replace(/^(?!.*:host)([^@%\n]*){/gim, $1 => prefix+' '+$1 )            // ... {      -> tag ... {
-    .replace(/^(?!.*:host)(.*?),\s*$/gim, $1 => prefix+' '+$1)              // ... ,      -> tag ... ,
-    .replace(/:host\((.*?)\)/gi, ($1, $2) => prefix+$2)                     // :host(...) -> tag...
-    .replace(/:host /gi, prefix + " ")                                      // :host      -> tag
-    .replace(/\/deep\/ /gi, '')                                             // /deep/     -> 
-    .replace(/^.*:host-context\((.*)\)/gim, ($1, $2) => $2 + " " + prefix)  // :host(...) -> tag...
-}
+const transform = names => (styles, i) => scope(styles, '[css~="' + names[i] + '"]')
 
 const css = ripple => res => 
   all(`[css~="${res.name}"]:not([inert])`)
@@ -75,5 +64,6 @@ import not from 'utilise/not'
 import by from 'utilise/by'
 import is from 'utilise/is'
 import el from 'utilise/el'
+import scope from 'cssscope'
 const log = require('utilise/log')('[ri/precss]')
     , err = require('utilise/err')('[ri/precss]')

@@ -61,6 +61,10 @@ var _el = require('utilise/el');
 
 var _el2 = _interopRequireDefault(_el);
 
+var _cssscope = require('cssscope');
+
+var _cssscope2 = _interopRequireDefault(_cssscope);
+
 /* istanbul ignore next */
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -96,7 +100,7 @@ var render = function render(ripple) {
       if (css.some((0, _not2.default)(_is2.default.in(ripple.resources)))) return;
 
       // retrieve styles
-      styles = css.map((0, _from2.default)(ripple.resources)).map((0, _key2.default)('body')).map(scope(host, shadow, css));
+      styles = css.map((0, _from2.default)(ripple.resources)).map((0, _key2.default)('body')).map(shadow ? _identity2.default : transform(css));
 
       // reuse or create style tag
       css.map(function (d) {
@@ -113,25 +117,9 @@ var render = function render(ripple) {
   };
 };
 
-var scope = function scope(el, shadow, names) {
-  return shadow ? _identity2.default : function (styles, i) {
-    var prefix = '[css~="' + names[i] + '"]',
-        escaped = '\\[css~="' + names[i] + '"\\]';
-
-    return styles.replace(/^(?!.*:host)([^@%\n]*){/gim, function ($1) {
-      return prefix + ' ' + $1;
-    }) // ... {      -> tag ... {
-    .replace(/^(?!.*:host)(.*?),\s*$/gim, function ($1) {
-      return prefix + ' ' + $1;
-    }) // ... ,      -> tag ... ,
-    .replace(/:host\((.*?)\)/gi, function ($1, $2) {
-      return prefix + $2;
-    }) // :host(...) -> tag...
-    .replace(/:host /gi, prefix + " ") // :host      -> tag
-    .replace(/\/deep\/ /gi, '') // /deep/     ->
-    .replace(/^.*:host-context\((.*)\)/gim, function ($1, $2) {
-      return $2 + " " + prefix;
-    }); // :host(...) -> tag...
+var transform = function transform(names) {
+  return function (styles, i) {
+    return (0, _cssscope2.default)(styles, '[css~="' + names[i] + '"]');
   };
 };
 

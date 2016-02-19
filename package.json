@@ -31,6 +31,7 @@
     "rijs.shadow": "*"
   },
   "dependencies": {
-    "utilise": "*"
+    "utilise": "*",
+    "cssscope": "*"
   }
 }
