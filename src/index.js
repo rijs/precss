@@ -1,5 +1,5 @@
 // -------------------------------------------
-// API: Pre-applies Scoped CSS [css=name]
+// Pre-applies Scoped CSS [css=name]
 // -------------------------------------------
 export default function precss(ripple){
   if (!client) return;
@@ -30,13 +30,13 @@ const render = ripple => next => host => {
   // retrieve styles
   styles = css
     .map(from(ripple.resources))
-    .map(key('body'))
+    .map(d => d.body)
     .map(shadow ? identity : transform(css))
 
   // reuse or create style tag
   css
     .map(d => raw(`style[resource="${d}"]`, shadow ? root : head) || el(`style[resource=${d}]`))
-    .map(key('innerHTML', (d, i) => styles[i]))
+    .map((d, i) => d.innerHTML = styles[i])
     .filter(not(by('parentNode')))
     .map(d => shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d))
 
@@ -59,7 +59,6 @@ import from from 'utilise/from'
 import all from 'utilise/all'
 import raw from 'utilise/raw'
 import str from 'utilise/str'
-import key from 'utilise/key'
 import not from 'utilise/not'
 import by from 'utilise/by'
 import is from 'utilise/is'
