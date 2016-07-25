@@ -41,10 +41,6 @@ var _str = require('utilise/str');
 
 var _str2 = _interopRequireDefault(_str);
 
-var _key = require('utilise/key');
-
-var _key2 = _interopRequireDefault(_key);
-
 var _not = require('utilise/not');
 
 var _not2 = _interopRequireDefault(_not);
@@ -69,7 +65,7 @@ var _cssscope2 = _interopRequireDefault(_cssscope);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // -------------------------------------------
-// API: Pre-applies Scoped CSS [css=name]
+// Pre-applies Scoped CSS [css=name]
 // -------------------------------------------
 function precss(ripple) {
   if (!_client2.default) return;
@@ -100,14 +96,16 @@ var render = function render(ripple) {
       if (css.some((0, _not2.default)(_is2.default.in(ripple.resources)))) return;
 
       // retrieve styles
-      styles = css.map((0, _from2.default)(ripple.resources)).map((0, _key2.default)('body')).map(shadow ? _identity2.default : transform(css));
+      styles = css.map((0, _from2.default)(ripple.resources)).map(function (d) {
+        return d.body;
+      }).map(shadow ? _identity2.default : transform(css));
 
       // reuse or create style tag
       css.map(function (d) {
         return (0, _raw2.default)('style[resource="' + d + '"]', shadow ? root : head) || (0, _el2.default)('style[resource=' + d + ']');
-      }).map((0, _key2.default)('innerHTML', function (d, i) {
-        return styles[i];
-      })).filter((0, _not2.default)((0, _by2.default)('parentNode'))).map(function (d) {
+      }).map(function (d, i) {
+        return d.innerHTML = styles[i];
+      }).filter((0, _not2.default)((0, _by2.default)('parentNode'))).map(function (d) {
         return shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d);
       });
 
