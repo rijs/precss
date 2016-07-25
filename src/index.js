@@ -36,7 +36,7 @@ const render = ripple => next => host => {
   // reuse or create style tag
   css
     .map(d => raw(`style[resource="${d}"]`, shadow ? root : head) || el(`style[resource=${d}]`))
-    .map((d, i) => d.innerHTML = styles[i])
+    .map((d, i) => (d.innerHTML = styles[i], d))
     .filter(not(by('parentNode')))
     .map(d => shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d))
 

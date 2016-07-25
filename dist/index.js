@@ -104,7 +104,7 @@ var render = function render(ripple) {
       css.map(function (d) {
         return (0, _raw2.default)('style[resource="' + d + '"]', shadow ? root : head) || (0, _el2.default)('style[resource=' + d + ']');
       }).map(function (d, i) {
-        return d.innerHTML = styles[i];
+        return d.innerHTML = styles[i], d;
       }).filter((0, _not2.default)((0, _by2.default)('parentNode'))).map(function (d) {
         return shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d);
       });
