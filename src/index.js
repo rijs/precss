@@ -27,16 +27,19 @@ const render = ripple => next => host => {
   // this host has a css dep, but it is not loaded yet - stop rendering this host
   if (css.some(not(is.in(ripple.resources)))) return;
 
-  // retrieve styles
-  styles = css
-    .map(from(ripple.resources))
-    .map(d => d.body)
-    .map(shadow ? identity : transform(css))
-
-  // reuse or create style tag
   css
-    .map(d => raw(`style[resource="${d}"]`, shadow ? root : head) || el(`style[resource=${d}]`))
-    .map((d, i) => (d.innerHTML = styles[i], d))
+    // reuse or create style tag
+    .map(d => ({ 
+      res: ripple.resources[d] 
+    , el: raw(`style[resource="${d}"]`, shadow ? root : head) || el(`style[resource=${d}]`) 
+    }))
+    // check if hash of styles changed
+    .filter((d, i) => d.el.hash != d.res.headers.hash)
+    .map((d, i) => {
+      d.el.hash = d.res.headers.hash
+      d.el.innerHTML = shadow ? d.res.body : transform(d.res.body, d.res.name)
+      return d.el
+    })
     .filter(not(by('parentNode')))
     .map(d => shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d))
 
@@ -44,7 +47,7 @@ const render = ripple => next => host => {
   return next(host)
 }
 
-const transform = names => (styles, i) => scope(styles, '[css~="' + names[i] + '"]')
+const transform = (styles, name) => scope(styles, '[css~="' + name + '"]')
 
 const css = ripple => res => 
   all(`[css~="${res.name}"]:not([inert])`)
