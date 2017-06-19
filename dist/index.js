@@ -95,16 +95,21 @@ var render = function render(ripple) {
       // this host has a css dep, but it is not loaded yet - stop rendering this host
       if (css.some((0, _not2.default)(_is2.default.in(ripple.resources)))) return;
 
-      // retrieve styles
-      styles = css.map((0, _from2.default)(ripple.resources)).map(function (d) {
-        return d.body;
-      }).map(shadow ? _identity2.default : transform(css));
-
+      css
       // reuse or create style tag
-      css.map(function (d) {
-        return (0, _raw2.default)('style[resource="' + d + '"]', shadow ? root : head) || (0, _el2.default)('style[resource=' + d + ']');
+      .map(function (d) {
+        return {
+          res: ripple.resources[d],
+          el: (0, _raw2.default)('style[resource="' + d + '"]', shadow ? root : head) || (0, _el2.default)('style[resource=' + d + ']')
+        };
+      })
+      // check if hash of styles changed
+      .filter(function (d, i) {
+        return d.el.hash != d.res.headers.hash;
       }).map(function (d, i) {
-        return d.innerHTML = styles[i], d;
+        d.el.hash = d.res.headers.hash;
+        d.el.innerHTML = shadow ? d.res.body : transform(d.res.body, d.res.name);
+        return d.el;
       }).filter((0, _not2.default)((0, _by2.default)('parentNode'))).map(function (d) {
         return shadow ? root.insertBefore(d, root.firstChild) : head.appendChild(d);
       });
@@ -115,10 +120,8 @@ var render = function render(ripple) {
   };
 };
 
-var transform = function transform(names) {
-  return function (styles, i) {
-    return (0, _cssscope2.default)(styles, '[css~="' + names[i] + '"]');
-  };
+var transform = function transform(styles, name) {
+  return (0, _cssscope2.default)(styles, '[css~="' + name + '"]');
 };
 
 var css = function css(ripple) {
