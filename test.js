@@ -35,7 +35,7 @@ describe('Scoped CSS', function(){
     var ripple = precss(components(fn(css(core()))))
       , result
       
-    ripple('foo.css', '* { color: red }', { hash: 'hash' })
+    ripple('foo.css', '* { color: red }')
     ripple('css-1', function(){ result = true })
     ripple.draw()
 
@@ -56,7 +56,7 @@ describe('Scoped CSS', function(){
     var ripple = precss(components(fn(css(core()))))
       , result
 
-    ripple('foo.css', '* { color: red }', { hash: 'hash' })
+    ripple('foo.css', '* { color: red }')
     ripple('css-2', function(){ result = true })
     ripple.draw()
 
@@ -74,7 +74,7 @@ describe('Scoped CSS', function(){
     ripple('css-3', function(){ result++ })
 
     time(50, function(){
-      ripple('foo.css', '* { color: red }', { hash: 'hash' })
+      ripple('foo.css', '* { color: red }')
     })
     
     time(150, function(){
@@ -123,7 +123,7 @@ describe('Scoped CSS', function(){
       , result
       , el = container.firstChild
 
-    ripple('foo.css', '* { color: red }', { hash: 'hash' })
+    ripple('foo.css', '* { color: red }')
     ripple('css-shadow', function(){ result = true })
     ripple.draw()
 
@@ -146,7 +146,7 @@ describe('Scoped CSS', function(){
                   + '}'
 
     ripple('css-keyframes', noop)
-    ripple('foo.css', keyframes, { hash: 'hash' })
+    ripple('foo.css', keyframes)
     ripple.draw()
 
     time(40, function() {
@@ -162,7 +162,7 @@ describe('Scoped CSS', function(){
       , style = ':host(.full) header > :not(h3) { }'
 
     ripple('css-greedy', noop)
-    ripple('foo.css', style, { hash: 'hash' })
+    ripple('foo.css', style)
     ripple.draw()
 
     time(40, function() {
@@ -177,11 +177,11 @@ describe('Scoped CSS', function(){
       , result
 
     ripple('css-multi', function(){ result = true })
-    ripple('foo.css', ' ', { hash: 'hash' })
+    ripple('foo.css', ' ')
 
     time(40, function(){
       expect(result).to.not.be.ok
-      ripple('bar.css', ' ', { hash: 'hash' })
+      ripple('bar.css', ' ')
       expect(result).to.not.be.ok
     })
 
@@ -199,7 +199,7 @@ describe('Scoped CSS', function(){
       , style = ':host-context(.full:not(.a)) { }'
 
     ripple('css-context', noop)
-    ripple('foo.css', style, { hash: 'hash' })
+    ripple('foo.css', style)
     ripple.draw()
 
     time(40, function() {
@@ -211,9 +211,9 @@ describe('Scoped CSS', function(){
   it('should prefix additional css modules accordingly', function(done){  
     container.innerHTML = '<css-prefix css="css-prefix.css foo.css bar.css">'
     var ripple = precss(components(fn(css(core()))))
-    ripple('css-prefix.css', '.css-prefix {}', { hash: 'hash' })
-    ripple('foo.css', '.foo {}', { hash: 'hash' })
-    ripple('bar.css', '.bar {}', { hash: 'hash' })
+    ripple('css-prefix.css', '.css-prefix {}')
+    ripple('foo.css', '.foo {}')
+    ripple('bar.css', '.bar {}')
     ripple('css-prefix', noop)
     ripple.draw()
 
@@ -230,7 +230,7 @@ describe('Scoped CSS', function(){
     var ripple = precss(components(fn(css(core()))))
       
     ripple('css-host', noop)
-    ripple('foo.css', '.foo :host(.is-sth) .bar {}', { hash: 'hash' })
+    ripple('foo.css', '.foo :host(.is-sth) .bar {}')
     ripple.draw()
 
     time(40, function() {
@@ -244,7 +244,7 @@ describe('Scoped CSS', function(){
     var ripple = precss(components(fn(css(core()))))
       
     ripple('css-empty', noop)
-    ripple('foo.css', ':host() {}', { hash: 'hash' })
+    ripple('foo.css', ':host() {}')
     ripple.draw()
 
     time(40, function() {
@@ -258,7 +258,7 @@ describe('Scoped CSS', function(){
     var ripple = precss(components(fn(css(core()))))
       
     ripple('css-empty-context', noop)
-    ripple('foo.css', ':host-context() {}', { hash: 'hash' })
+    ripple('foo.css', ':host-context() {}')
     ripple.draw()
 
     time(40, function() {
@@ -272,7 +272,7 @@ describe('Scoped CSS', function(){
     var ripple = precss(components(fn(css(core()))))
       
     ripple('css-host-list', noop)
-    ripple('foo.css', ':host,\n.foo {}', { hash: 'hash' })
+    ripple('foo.css', ':host,\n.foo {}')
     ripple.draw()
 
     time(40, function() {
@@ -284,19 +284,19 @@ describe('Scoped CSS', function(){
   it('should only render if stylesheet hash changed', function(done){  
     container.innerHTML = '<css-hash css="foo.css"><a></a></css-hash>'
     var ripple = precss(components(fn(css(core()))))
-      , result = 0
-
-    ripple('css-hash', function(){ result++ })
-    ripple('foo.css', '* { color: red }', { hash: 'hash' })
+      
+    ripple('css-hash', function(){})
+    ripple('foo.css', '* { color: red }')
 
     time(40, function(){
       expect(head.lastChild.outerHTML).to.equal('<style resource="foo.css">[css~="foo.css"] * { color: red }</style>')
-      ripple('foo.css', '* { color: green }', { hash: 'hash' })
+      head.lastChild.innerHTML = 'untouched'
+      ripple('foo.css', '* { color: red }')
     })
     
     time(80, function(){
-      expect(head.lastChild.outerHTML).to.equal('<style resource="foo.css">[css~="foo.css"] * { color: red }</style>')
-      ripple('foo.css', '* { color: blue }', { hash: 'diff' })
+      expect(head.lastChild.outerHTML).to.equal('<style resource="foo.css">untouched</style>')
+      ripple('foo.css', '* { color: blue }')
     })
 
     time(120, function(){
