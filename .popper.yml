@@ -7,6 +7,8 @@ tests: (npm run build > /dev/null) && browserify ./test.js
   -i chai
   | sed -E "s/require\('chai'\)/window.chai/"
 
+farm: saucelabs
+
 watch: 
   - src
   - test.js
