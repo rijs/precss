@@ -49,9 +49,9 @@ describe('Scoped CSS', function(){
   })
 
   it('should not append css twice outside shadow dom', function(done){  
-    container.innerHTML = `
-      <css-2 css="foo.css"></css-2>
-      <css-2 css="foo.css"></css-2>`
+    container.innerHTML = 
+      '<css-2 css="foo.css"></css-2>'
+    + '<css-2 css="foo.css"></css-2>'
 
     var ripple = precss(components(fn(css(core()))))
       , result
