@@ -16,4 +16,4 @@ watch:
 browsers:
   - chrome
   - firefox
-  - ie11
+  - ie9
