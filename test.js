@@ -21,7 +21,10 @@ describe('Scoped CSS', function(){
   })
   
   beforeEach(function(done){
-    document.head.innerHTML = clean
+    // NOTE: head read only on IE9
+    // try { document.head.innerHTML = clean } catch (e) {}
+    while (document.head.children.length) 
+      document.head.removeChild(document.head.firstChild)
     container.innerHTML = ''
     time(40, done)
   })
@@ -39,7 +42,7 @@ describe('Scoped CSS', function(){
     ripple('css-1', function(){ result = true })
     ripple.draw()
 
-    time(40, function() {
+    time(150, function() {
       expect(result).to.be.ok
       expect(head.lastChild.outerHTML).to.equal('<style resource="foo.css">[css~="foo.css"] * { color: red }</style>')
       expect(getComputedStyle(container.firstChild.firstChild).color).to.be.eql('rgb(255, 0, 0)')
