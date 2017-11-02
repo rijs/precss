@@ -1,16 +1,10 @@
 // -------------------------------------------
 // Pre-applies Scoped CSS [css=name]
 // -------------------------------------------
-export default function precss(ripple){
+module.exports = function precss(ripple){
   if (!client) return;
-  log('creating')
-  
+  log('creating')  
   ripple.render = render(ripple)(ripple.render)
-
-  values(ripple.types)
-    .filter(by('header', 'text/css'))
-    .map(type => type.render = proxy(type.render, css(ripple)))
-
   return ripple
 }
 
@@ -49,23 +43,13 @@ const render = ripple => next => host => {
 
 const transform = (styles, name) => scope(styles, '[css~="' + name + '"]')
 
-const css = ripple => res => 
-  all(`[css~="${res.name}"]:not([inert])`)
-    .map(ripple.draw)
-
-import identity from 'utilise/identity'
-import client from 'utilise/client'
-import values from 'utilise/values'
-import proxy from 'utilise/proxy'
-import attr from 'utilise/attr'
-import from from 'utilise/from'
-import all from 'utilise/all'
-import raw from 'utilise/raw'
-import str from 'utilise/str'
-import not from 'utilise/not'
-import by from 'utilise/by'
-import is from 'utilise/is'
-import el from 'utilise/el'
-import scope from 'cssscope'
 const log = require('utilise/log')('[ri/precss]')
-    , err = require('utilise/err')('[ri/precss]')
+    , client = require('utilise/client')
+    , attr = require('utilise/attr')
+    , raw = require('utilise/raw')
+    , str = require('utilise/str')
+    , not = require('utilise/not')
+    , by = require('utilise/by')
+    , is = require('utilise/is')
+    , el = require('utilise/el')
+    , scope = require('cssscope')
